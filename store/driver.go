@@ -73,4 +73,16 @@ type Driver interface {
 	ListReactions(ctx context.Context, find *FindReaction) ([]*Reaction, error)
 	GetReaction(ctx context.Context, find *FindReaction) (*Reaction, error)
 	DeleteReaction(ctx context.Context, delete *DeleteReaction) error
+
+	// Area model related methods.
+	CreateArea(ctx context.Context, create *Area) (*Area, error)
+	ListAreas(ctx context.Context, find *FindArea) ([]*Area, error)
+	UpdateArea(ctx context.Context, update *UpdateArea) error
+	DeleteArea(ctx context.Context, delete *DeleteArea) error
+
+	// Folder model related methods.
+	CreateFolder(ctx context.Context, create *Folder) (*Folder, error)
+	ListFolders(ctx context.Context, find *FindFolder) ([]*Folder, error)
+	UpdateFolder(ctx context.Context, update *UpdateFolder) error
+	DeleteFolder(ctx context.Context, delete *DeleteFolder) error
 }

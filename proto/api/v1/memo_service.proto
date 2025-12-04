@@ -219,6 +219,20 @@ message Memo {
   // Optional. The location of the memo.
   optional Location location = 18 [(google.api.field_behavior) = OPTIONAL];
 
+  // Optional. The name of the folder this memo belongs to.
+  // Format: folders/{folder}
+  optional string folder = 19 [
+    (google.api.field_behavior) = OPTIONAL,
+    (google.api.resource_reference) = {type: "memos.api.v1/Folder"}
+  ];
+
+  // Optional. The name of the area this memo belongs to (when not in a folder).
+  // Format: areas/{area}
+  optional string area = 20 [
+    (google.api.field_behavior) = OPTIONAL,
+    (google.api.resource_reference) = {type: "memos.api.v1/Area"}
+  ];
+
   // Computed properties of a memo.
   message Property {
     bool has_link = 1;

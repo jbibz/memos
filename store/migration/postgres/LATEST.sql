@@ -34,6 +34,40 @@ CREATE TABLE user_setting (
   UNIQUE(user_id, key)
 );
 
+-- area
+CREATE TABLE area (
+  id SERIAL PRIMARY KEY,
+  uid TEXT NOT NULL UNIQUE,
+  creator_id INTEGER NOT NULL,
+  created_ts BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW()),
+  updated_ts BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW()),
+  row_status TEXT NOT NULL DEFAULT 'NORMAL',
+  name TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  parent_id INTEGER DEFAULT NULL
+);
+
+CREATE INDEX idx_area_creator_id ON area (creator_id);
+CREATE INDEX idx_area_parent_id ON area (parent_id);
+
+-- folder
+CREATE TABLE folder (
+  id SERIAL PRIMARY KEY,
+  uid TEXT NOT NULL UNIQUE,
+  creator_id INTEGER NOT NULL,
+  area_id INTEGER NOT NULL,
+  created_ts BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW()),
+  updated_ts BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW()),
+  row_status TEXT NOT NULL DEFAULT 'NORMAL',
+  name TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  parent_id INTEGER DEFAULT NULL
+);
+
+CREATE INDEX idx_folder_creator_id ON folder (creator_id);
+CREATE INDEX idx_folder_area_id ON folder (area_id);
+CREATE INDEX idx_folder_parent_id ON folder (parent_id);
+
 -- memo
 CREATE TABLE memo (
   id SERIAL PRIMARY KEY,
@@ -45,8 +79,13 @@ CREATE TABLE memo (
   content TEXT NOT NULL,
   visibility TEXT NOT NULL DEFAULT 'PRIVATE',
   pinned BOOLEAN NOT NULL DEFAULT FALSE,
-  payload JSONB NOT NULL DEFAULT '{}'
+  payload JSONB NOT NULL DEFAULT '{}',
+  folder_id INTEGER DEFAULT NULL,
+  area_id INTEGER DEFAULT NULL
 );
+
+CREATE INDEX idx_memo_folder_id ON memo (folder_id);
+CREATE INDEX idx_memo_area_id ON memo (area_id);
 
 -- memo_organizer
 CREATE TABLE memo_organizer (

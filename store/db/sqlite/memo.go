@@ -26,6 +26,18 @@ func (d *DB) CreateMemo(ctx context.Context, create *store.Memo) (*store.Memo, e
 	}
 	args := []any{create.UID, create.CreatorID, create.Content, create.Visibility, payload}
 
+	if create.FolderID != nil {
+		fields = append(fields, "`folder_id`")
+		placeholder = append(placeholder, "?")
+		args = append(args, *create.FolderID)
+	}
+
+	if create.AreaID != nil {
+		fields = append(fields, "`area_id`")
+		placeholder = append(placeholder, "?")
+		args = append(args, *create.AreaID)
+	}
+
 	stmt := "INSERT INTO `memo` (" + strings.Join(fields, ", ") + ") VALUES (" + strings.Join(placeholder, ", ") + ") RETURNING `id`, `created_ts`, `updated_ts`, `row_status`"
 	if err := d.db.QueryRowContext(ctx, stmt, args...).Scan(
 		&create.ID,

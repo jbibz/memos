@@ -50,6 +50,10 @@ type Memo struct {
 	Pinned     bool
 	Payload    *storepb.MemoPayload
 
+	// Organization fields
+	FolderID *int32
+	AreaID   *int32
+
 	// Composed fields
 	ParentUID *string
 }

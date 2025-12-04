@@ -34,6 +34,38 @@ CREATE TABLE `user_setting` (
   UNIQUE(`user_id`,`key`)
 );
 
+-- area
+CREATE TABLE `area` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `uid` VARCHAR(256) NOT NULL UNIQUE,
+  `creator_id` INT NOT NULL,
+  `created_ts` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_ts` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `row_status` VARCHAR(256) NOT NULL DEFAULT 'NORMAL',
+  `name` TEXT NOT NULL,
+  `description` TEXT NOT NULL,
+  `parent_id` INT DEFAULT NULL,
+  KEY `idx_area_creator_id` (`creator_id`),
+  KEY `idx_area_parent_id` (`parent_id`)
+);
+
+-- folder
+CREATE TABLE `folder` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `uid` VARCHAR(256) NOT NULL UNIQUE,
+  `creator_id` INT NOT NULL,
+  `area_id` INT NOT NULL,
+  `created_ts` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_ts` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `row_status` VARCHAR(256) NOT NULL DEFAULT 'NORMAL',
+  `name` TEXT NOT NULL,
+  `description` TEXT NOT NULL,
+  `parent_id` INT DEFAULT NULL,
+  KEY `idx_folder_creator_id` (`creator_id`),
+  KEY `idx_folder_area_id` (`area_id`),
+  KEY `idx_folder_parent_id` (`parent_id`)
+);
+
 -- memo
 CREATE TABLE `memo` (
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -45,7 +77,11 @@ CREATE TABLE `memo` (
   `content` TEXT NOT NULL,
   `visibility` VARCHAR(256) NOT NULL DEFAULT 'PRIVATE',
   `pinned` BOOLEAN NOT NULL DEFAULT FALSE,
-  `payload` JSON NOT NULL
+  `payload` JSON NOT NULL,
+  `folder_id` INT DEFAULT NULL,
+  `area_id` INT DEFAULT NULL,
+  KEY `idx_memo_folder_id` (`folder_id`),
+  KEY `idx_memo_area_id` (`area_id`)
 );
 
 -- memo_organizer

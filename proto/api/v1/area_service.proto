@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package memos.api.v1;
+
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "gen/api/v1";
+
+service AreaService {
+  rpc CreateArea(CreateAreaRequest) returns (Area) {
+    option (google.api.http) = {post: "/api/v1/areas"};
+  }
+  rpc ListAreas(ListAreasRequest) returns (ListAreasResponse) {
+    option (google.api.http) = {get: "/api/v1/areas"};
+  }
+  rpc GetArea(GetAreaRequest) returns (Area) {
+    option (google.api.http) = {get: "/api/v1/{name=areas/*}"};
+    option (google.api.method_signature) = "name";
+  }
+  rpc UpdateArea(UpdateAreaRequest) returns (Area) {
+    option (google.api.http) = {
+      patch: "/api/v1/{area.name=areas/*}"
+      body: "area"
+    };
+    option (google.api.method_signature) = "area,update_mask";
+  }
+  rpc DeleteArea(DeleteAreaRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/api/v1/{name=areas/*}"};
+    option (google.api.method_signature) = "name";
+  }
+}
+
+message Area {
+  string name = 1;
+  string uid = 2;
+  google.protobuf.Timestamp create_time = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp update_time = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  string display_name = 5;
+  string description = 6;
+
+  string parent = 7;
+}
+
+message CreateAreaRequest {
+  Area area = 1;
+}
+
+message ListAreasRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3;
+}
+
+message ListAreasResponse {
+  repeated Area areas = 1;
+  string next_page_token = 2;
+}
+
+message GetAreaRequest {
+  string name = 1;
+}
+
+message UpdateAreaRequest {
+  Area area = 1 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message DeleteAreaRequest {
+  string name = 1;
+}

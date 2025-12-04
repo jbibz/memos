@@ -37,6 +37,40 @@ CREATE TABLE user_setting (
   UNIQUE(user_id, key)
 );
 
+-- area
+CREATE TABLE area (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  uid TEXT NOT NULL UNIQUE,
+  creator_id INTEGER NOT NULL,
+  created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
+  row_status TEXT NOT NULL CHECK (row_status IN ('NORMAL', 'ARCHIVED')) DEFAULT 'NORMAL',
+  name TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  parent_id INTEGER DEFAULT NULL
+);
+
+CREATE INDEX idx_area_creator_id ON area (creator_id);
+CREATE INDEX idx_area_parent_id ON area (parent_id);
+
+-- folder
+CREATE TABLE folder (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  uid TEXT NOT NULL UNIQUE,
+  creator_id INTEGER NOT NULL,
+  area_id INTEGER NOT NULL,
+  created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
+  row_status TEXT NOT NULL CHECK (row_status IN ('NORMAL', 'ARCHIVED')) DEFAULT 'NORMAL',
+  name TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  parent_id INTEGER DEFAULT NULL
+);
+
+CREATE INDEX idx_folder_creator_id ON folder (creator_id);
+CREATE INDEX idx_folder_area_id ON folder (area_id);
+CREATE INDEX idx_folder_parent_id ON folder (parent_id);
+
 -- memo
 CREATE TABLE memo (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -48,10 +82,14 @@ CREATE TABLE memo (
   content TEXT NOT NULL DEFAULT '',
   visibility TEXT NOT NULL CHECK (visibility IN ('PUBLIC', 'PROTECTED', 'PRIVATE')) DEFAULT 'PRIVATE',
   pinned INTEGER NOT NULL CHECK (pinned IN (0, 1)) DEFAULT 0,
-  payload TEXT NOT NULL DEFAULT '{}'
+  payload TEXT NOT NULL DEFAULT '{}',
+  folder_id INTEGER DEFAULT NULL,
+  area_id INTEGER DEFAULT NULL
 );
 
 CREATE INDEX idx_memo_creator_id ON memo (creator_id);
+CREATE INDEX idx_memo_folder_id ON memo (folder_id);
+CREATE INDEX idx_memo_area_id ON memo (area_id);
 
 -- memo_organizer
 CREATE TABLE memo_organizer (
