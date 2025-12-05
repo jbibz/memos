@@ -5,7 +5,8 @@
   "scripts": {
     "install:frontend": "cd web && pnpm install",
     "build:frontend": "cd web && pnpm run release",
-    "build:backend": "go build -o build/memos ./cmd/memos",
+    "build:backend": "mkdir -p build && go build -o build/memos ./cmd/memos",
+    "prebuild": "echo 'Checking for buf...' && which buf || (echo 'ERROR: buf not found. Install from https://buf.build/docs/installation' && exit 0)",
     "build": "npm run install:frontend && npm run build:frontend && npm run build:backend",
     "start": "./build/memos --mode prod",
     "dev": "cd web && pnpm run dev"

@@ -12,14 +12,17 @@ echo ""
 echo "Step 1: Installing pnpm globally..."
 npm install -g pnpm@8.15.0
 
+# Add npm global bin to PATH
+export PATH="$PATH:$(npm root -g)/../bin"
+
 echo ""
 echo "Step 2: Installing frontend dependencies..."
 cd web
-pnpm install --frozen-lockfile
+npx pnpm@8.15.0 install --frozen-lockfile
 
 echo ""
 echo "Step 3: Building frontend..."
-pnpm run release
+npx pnpm@8.15.0 run release
 
 echo ""
 echo "Step 4: Building backend..."
