@@ -1,0 +1,23 @@
+{
+  "name": "memos-with-project-management",
+  "version": "0.26.0",
+  "private": true,
+  "scripts": {
+    "install:frontend": "cd web && pnpm install",
+    "build:frontend": "cd web && pnpm run release",
+    "build:backend": "go build -o build/memos ./cmd/memos",
+    "build": "npm run install:frontend && npm run build:frontend && npm run build:backend",
+    "start": "./build/memos --mode prod",
+    "dev": "cd web && pnpm run dev"
+  },
+  "description": "Memos with Project Management System - Areas and Folders",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usememos/memos"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}

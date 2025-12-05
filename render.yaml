@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: memos-project-management
+    env: go
+    buildCommand: ./build.sh
+    startCommand: ./build/memos --mode prod --port $PORT
+    envVars:
+      - key: MEMOS_MODE
+        value: prod
+      - key: MEMOS_PORT
+        sync: false
+      - key: MEMOS_DATA
+        value: /opt/render/project/data
+    disk:
+      name: memos-data
+      mountPath: /opt/render/project/data
+      sizeGB: 1
