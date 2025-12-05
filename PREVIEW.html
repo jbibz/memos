@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management System Preview - Memos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            background: #fafafa;
+            border-right: 1px solid #e5e5e5;
+            padding: 20px;
+        }
+
+        .main {
+            padding: 20px;
+        }
+
+        /* Project Explorer Styles */
+        .project-explorer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .project-explorer-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        /* Tree View Styles */
+        .area-list {
+            list-style: none;
+        }
+
+        .area-item {
+            margin-bottom: 4px;
+        }
+
+        .area-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .area-header:hover {
+            background: #f3f4f6;
+        }
+
+        .area-header:hover .add-folder-btn {
+            opacity: 1;
+        }
+
+        .chevron {
+            width: 16px;
+            height: 16px;
+            color: #6b7280;
+            transition: transform 0.2s;
+        }
+
+        .chevron.expanded {
+            transform: rotate(90deg);
+        }
+
+        .area-icon {
+            width: 16px;
+            height: 16px;
+            color: #3b82f6;
+        }
+
+        .area-name {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .add-folder-btn {
+            opacity: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .add-folder-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .folder-list {
+            list-style: none;
+            margin-left: 24px;
+            margin-top: 4px;
+        }
+
+        .folder-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 2px;
+        }
+
+        .folder-item:hover {
+            background: #f3f4f6;
+        }
+
+        .folder-item.active {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .folder-icon {
+            width: 16px;
+            height: 16px;
+            color: #f59e0b;
+        }
+
+        .folder-name {
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .folder-item.active .folder-name {
+            color: #7c3aed;
+            font-weight: 500;
+        }
+
+        /* Memo Editor Styles */
+        .memo-editor {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .editor-header {
+            margin-bottom: 16px;
+        }
+
+        .editor-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #111827;
+        }
+
+        .folder-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .select {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .editor-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        /* Memo List Styles */
+        .memo-list {
+            margin-top: 20px;
+        }
+
+        .memo-list-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #111827;
+        }
+
+        .memo-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .memo-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-color: #d1d5db;
+        }
+
+        .memo-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .memo-content {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        /* Badge Styles */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .badge-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-yellow {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Project Management System</h1>
+            <p>Hierarchical organization for your memos: Areas → Folders → Notes</p>
+        </div>
+
+        <div class="content">
+            <!-- Sidebar with Project Explorer -->
+            <div class="sidebar">
+                <div class="project-explorer-header">
+                    <div class="project-explorer-title">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                        Projects
+                    </div>
+                    <button class="btn btn-primary">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        New
+                    </button>
+                </div>
+
+                <ul class="area-list">
+                    <!-- Homelabs Area -->
+                    <li class="area-item">
+                        <div class="area-header">
+                            <svg class="chevron expanded" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                            <svg class="area-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                            </svg>
+                            <span class="area-name">Homelabs</span>
+                            <button class="add-folder-btn" title="Add folder">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <ul class="folder-list">
+                            <li class="folder-item active">
+                                <svg class="folder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                                </svg>
+                                <span class="folder-name">Equipment</span>
+                            </li>
+                            <li class="folder-item">
+                                <svg class="folder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                                </svg>
+                                <span class="folder-name">Self-hosted apps</span>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Work Area -->
+                    <li class="area-item">
+                        <div class="area-header">
+                            <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                            <svg class="area-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                            </svg>
+                            <span class="area-name">Work</span>
+                            <button class="add-folder-btn" title="Add folder">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </li>
+
+                    <!-- Personal Area -->
+                    <li class="area-item">
+                        <div class="area-header">
+                            <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                            <svg class="area-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                            </svg>
+                            <span class="area-name">Personal</span>
+                            <button class="add-folder-btn" title="Add folder">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main">
+                <!-- Memo Editor -->
+                <div class="memo-editor">
+                    <div class="editor-header">
+                        <h3 class="editor-title">Create New Memo</h3>
+
+                        <!-- Folder Selector -->
+                        <div class="folder-selector">
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                            </svg>
+                            <select class="select">
+                                <option>Homelabs</option>
+                                <option>Work</option>
+                                <option>Personal</option>
+                            </select>
+                            <select class="select">
+                                <option>Equipment</option>
+                                <option>Self-hosted apps</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <textarea class="textarea" placeholder="Write your note in Markdown...
+
+# Dell R720 Server Specs
+
+## Hardware Configuration
+- CPU: 2x Intel Xeon E5-2670
+- RAM: 128GB DDR3 ECC
+- Storage: 8x 4TB HDDs in RAID 10
+
+## Network
+- 4x 1Gbps NICs (bonded)
+- IPMI for remote management
+
+## Current Usage
+Running Proxmox VE with multiple VMs..."></textarea>
+
+                    <div class="editor-footer">
+                        <button class="btn">Cancel</button>
+                        <button class="btn btn-primary">Save Memo</button>
+                    </div>
+                </div>
+
+                <!-- Memo List -->
+                <div class="memo-list">
+                    <h3 class="memo-list-header">📁 Equipment Folder</h3>
+
+                    <div class="memo-card">
+                        <div class="memo-meta">
+                            <span class="badge badge-blue">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
+                                </svg>
+                                Homelabs
+                            </span>
+                            <span class="badge badge-yellow">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                                </svg>
+                                Equipment
+                            </span>
+                            <span>2 hours ago</span>
+                        </div>
+                        <div class="memo-content">
+                            <strong>Dell R720 Server Specs</strong><br>
+                            Current configuration: 2x Intel Xeon E5-2670, 128GB RAM, 8x 4TB HDDs in RAID 10. Running Proxmox VE with multiple VMs for homelab services.
+                        </div>
+                    </div>
+
+                    <div class="memo-card">
+                        <div class="memo-meta">
+                            <span class="badge badge-blue">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
+                                </svg>
+                                Homelabs
+                            </span>
+                            <span class="badge badge-yellow">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                                </svg>
+                                Equipment
+                            </span>
+                            <span>1 day ago</span>
+                        </div>
+                        <div class="memo-content">
+                            <strong>Network Switch Configuration</strong><br>
+                            Cisco SG300-28 managed switch. VLANs configured: VLAN 10 (Management), VLAN 20 (Servers), VLAN 30 (IoT). Trunk port to firewall on port 28.
+                        </div>
+                    </div>
+
+                    <div class="memo-card">
+                        <div class="memo-meta">
+                            <span class="badge badge-blue">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
+                                </svg>
+                                Homelabs
+                            </span>
+                            <span class="badge badge-yellow">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                                </svg>
+                                Equipment
+                            </span>
+                            <span>3 days ago</span>
+                        </div>
+                        <div class="memo-content">
+                            <strong>UPS Battery Replacement Schedule</strong><br>
+                            APC Smart-UPS 1500 - Last battery replacement: Jan 2023. Next replacement due: Jan 2026. Runtime test passed at 15 minutes under full load.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add interactive behavior
+        document.querySelectorAll('.area-header').forEach(header => {
+            header.addEventListener('click', (e) => {
+                if (e.target.closest('.add-folder-btn')) return;
+
+                const chevron = header.querySelector('.chevron');
+                const folderList = header.parentElement.querySelector('.folder-list');
+
+                if (chevron.classList.contains('expanded')) {
+                    chevron.classList.remove('expanded');
+                    if (folderList) folderList.style.display = 'none';
+                } else {
+                    chevron.classList.add('expanded');
+                    if (folderList) folderList.style.display = 'block';
+                }
+            });
+        });
+
+        document.querySelectorAll('.folder-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.folder-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
